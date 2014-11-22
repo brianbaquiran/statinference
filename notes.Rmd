@@ -1,0 +1,111 @@
+---
+title: "Understanding Variability via Simulations"
+author: "Brian Baquiran"
+date: "November 17, 2014"
+output: html_document
+---
+# Simulation Example #1
+
+Standard normals have variance 1; the _means_ of $n$ samples of a standard normal have a standard error $\frac{1}{\sqrt{n}}$
+
+```{r}
+nosim <- 1000
+n <- 10
+```
+
+Let's simulate `r nosim` draws of `r n` samples from a standard normal population. 
+For each simulation we get the mean, and then the standard deviation of all of the `r nosim` means.
+
+```{r}
+sd(apply(matrix(rnorm(nosim * n), nosim), 1, mean))
+```
+
+We can compare this value to the $\frac{1}{\sqrt{n}}$ value we expect for the standard error.
+
+```{r}
+1/sqrt(n)
+``` 
+
+Note that it's close to the random value above.
+
+## Quiz 2
+
+### Question 1
+What is the variance of the distribution of the average an IID draw of n observations from a population with mean $\mu$ and variance $\sigma^2$.
+
+The variance of the sample mean is $\frac{\sigma^2}{n}$.
+
+### Question 2
+Suppose that diastolic blood pressures (DBPs) for men aged 35-44 are normally distributed with a mean of 80 (mm Hg) and a standard deviation of 10. About what is the probability that a random 35-44 year old has a DBP less than 70?
+
+Note that 70 is one standard deviation lower than the mean. Recall that 68% of the observations will be within one standard deviation, and half of that (34%) will be below the mean. Since in the normal distribution the mean and median are the same, we can just subtract 34% from 50% and get 16%. So the probability that the random subject will have a DBP one standard deviation lower than the mean, is 16%.
+
+To solve this in R, we use _pnorm_
+```{r}
+mean <- 80
+sd <- 10
+DBP <- 70
+pnorm(DBP,mean,sd)
+```
+
+### Question 3
+Brain volume for adult women is normally distributed with a mean of about 1,100 cc for women with a standard deviation of 75 cc. About what brain volume represents the 95th percentile?
+
+To solve this in R, we use _qnorm_
+```{r}
+mean <- 1100
+sd <- 75
+p <- 0.95
+qnorm(p,mean,sd)
+```
+
+### Question 4
+Refer to the previous question. Brain volume for adult women is about 1,100 cc for women with a standard deviation of 75 cc. Consider the sample mean of 100 random adult women from this population. Around what is the 95th percentile of the distribution of that sample mean?
+
+The question refers to the distribution of the sample mean. The sample mean has a standard error of s/sqrt(n). To get the 95th percentile of sample means, we just use qnorm.
+
+```{r}
+n <- 100
+standard_dev <- 75
+standard_error <- standard_dev/sqrt(100)
+qnorm(.95,standard_error,mean=1100)
+```
+
+### Question 5
+You flip a fair coin 5 times, about what's the probability of getting 4 or 5 heads?
+
+This is a Binomial distribution. We can compute the probabilities for 4 heads and 5 heads separately, then add.
+```{r}
+choose(5,4) * .5 ^ 5 + choose(5,5) * .5 ^ 5
+```
+
+Alternately, we could use the pbinom to compute for the possibility.
+```{r}
+pbinom(3,size=5,prob=.5,lower.tail = FALSE)
+```
+
+### Question 6
+The respiratory disturbance index (RDI), a measure of sleep disturbance, for a specific population has a mean of 15 (sleep events per hour) and a standard deviation of 10. They are not normally distributed. Give your best estimate of the probability that a sample mean RDI of 100 people is between 14 and 16 events per hour?
+
+Again, we are interested in the distribution of sample means. Thus we need the sample error. 
+```{r}
+RDI_mean <- 15
+RDI_sd <- 10
+RDI_n <- 100
+RDI_sample_err <- 10/sqrt(100)
+```
+Our sample error is `r RDI_sample_err`.
+
+Even if the individual observations are not normally distributed, CLT says that the means of samples will be normally distributed. The range we're interested in is exactly one standard error away from the mean, so 68% of the sample means will be within this range.
+
+### Question 7
+Consider a standard uniform density. The mean for this density is .5 and the variance is $\frac{1}{12}$. You sample 1,000 observations from this distribution and take the sample mean, what value would you expect it to be near?
+
+It will be near the mean, 0.5.
+
+### Question 8
+The number of people showing up at a bus stop is assumed to be Poisson with a mean of 5 people per hour. You watch the bus stop for 3 hours. About what's the probability of viewing 10 or fewer people?
+
+```{r}
+ppois(10, lambda=5*3)
+```

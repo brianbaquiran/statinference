@@ -1,0 +1,69 @@
+---
+title: "Sample Means of an Exponential Distribution"
+author: "Brian Baquiran"
+date: "November 22, 2014"
+output: html_document
+---
+## The Exponential Distribution
+
+The exponential distribution represents the distribution of 
+waiting times in a Poisson process with rate of change $\lambda$. 
+
+The probability density function for the exponential distribution is 
+$$f(x;\lambda)=\begin{cases}
+\lambda e^{-\lambda x} & x \ge 0 \\
+0 & x<0
+\end{cases}
+$$
+
+The distribution is supported on the interval $[0, \infty)$. 
+
+The mean of an exponential distribution is $\frac{1}{\lambda}$ and the standard deviation is also also $\frac{1}{\lambda}$.
+
+In R the exponential distribution is simulated with rexp(n, lambda) where lambda is the rate parameter.
+```{r}
+n <- 40
+lambda <- 0.2
+
+# our expected mean and standard deviation
+1/lambda
+```
+
+We expect to observe a mean and standard deviation of `r 1/lambda` from our simulation. 
+
+## Simulation
+To get a more intuitive understanding of the exponential 
+distribution, let us first see what it looks like. We ask R 
+to give us 40,000 random values from the distribution, and 
+plot them on a histogram.
+
+```{r}
+# 1,000 simulations
+num.sims <- 1000
+X <- rexp(n*num.sims,lambda)
+hist(X,breaks=100, main = "Exponential Distribution")
+```
+
+### Mean and Standard Deviation
+We compute the mean and standard deviation of the random values 
+and compare them to our expected value and standard deviation 
+of $\frac{1}{\lambda}$.
+```{r}
+print(Xbar<-mean(X))
+```
+The mean for the 40,000 generated random values is `r Xbar`.
+
+```{r}
+sd(X)
+```
+
+The standard deviation for the random values is `r sd(X)`.
+
+Both the observed mean and standard deviation are close to 
+$\frac{1}{\lambda}$ which we know to be `r 1/lambda`.
+
+```{r}
+X2 <- matrix(X,nrow=num.sims)
+d_means <- apply(X2,1,mean)
+hist(d_means,breaks=50, main ="Means of sample size 40")
+```
