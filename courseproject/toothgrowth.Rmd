@@ -1,0 +1,110 @@
+---
+title: "The Effect of Vitamin C on Tooth Growth in Guinea Pigs"
+author: "Brian Baquiran"
+date: "November 23, 2014"
+output: pdf_document
+---
+### The ToothGrowth Dataset
+The response is the length of odontoblasts (teeth) in each 
+of 10 guinea pigs at each of three dose levels of Vitamin C 
+(0.5, 1, and 2 mg) with each of two delivery methods (orange
+juice or ascorbic acid).
+
+The data consists of a data frame with 60 observations on 3 
+variables.
+
+Index|colname|class|description
+-----|-------|-----|-------------
+[,1]|len|numeric|Tooth length
+[,2]|supp|factor|Supplement type (VC or OJ).
+[,3]|dose|numeric|Dose in milligrams.
+
+
+### Exploratory Analysis
+A box plot of the resulting tooth growth for different dosages 
+and delivery methods of vitamin C:
+```{r, echo=FALSE}
+library("datasets"); library("plyr"); library("ggplot2")
+data("ToothGrowth")
+qplot(dose, len, colour=supp, data=ToothGrowth, facets= dose ~ supp, geom="boxplot")
+```
+
+A summary of the means and standard deviation and error for 
+the samples of the different treatments.
+```{r}
+ddply(.data = ToothGrowth, .variables = .(supp,dose), summarize, mean = mean(len), std.dev = sd(len), n=length(len), std.error = sd(len)/sqrt(length(len)))
+```
+
+From the summary data and the box plot, it would appear that 
+for a given dose (0.5mg, 1.0mg, 2.0mg) the OJ delivery method
+results in greater tooth growth. 
+
+### Hypothesis
+Our null hypothesis is that the mean tooth growth for the 
+orange juice (OJ) group is equal to the mean tooth growth of
+the ascorbic acid group (VC), for the same dosage of vitamin 
+C. The alternative hypothesis is that they are not equal.
+
+$$H_{0}:\mu_{vc}=\mu_{oj} \Leftrightarrow \mu_{vc}-\mu_{oj} = 0$$
+$$H_{a}:\mu_{vc}\neq\mu_{oj}$$
+
+Our test statistic will be that for two group intervals:
+
+$$TS=\frac{\overline{X_{1}}-\overline{X_{2}}}{\sqrt{\frac{S_{1}^2}{n_{1}}+\frac{S_{2}^2}{n_{2}}}}$$
+
+### Assumptions
+We will assume $\alpha=0.05$, or a 95% confidence interval. 
+We will use the Student t distribution due to the small 
+sample size (n=10 for each treatment modality). 
+
+The rejection region can be obtained using qt() for our desired confidence interval:
+```{r}
+c(qt(0.025,9),qt(0.975,9))
+```
+We can reject $H_{0}$ if the test statistic falls outside 
+this interval.
+
+### Comparing OJ and VC for the different doses
+We can use the mean and standard deviations for each treatment
+modality computed earlier to determine the test statistic for
+comparing OJ and VC for a 0.5mg vitamin C dose.
+```{r}
+(13.23-7.98)/sqrt((4.460^2/10)+(2.747^2)/10)
+```
+This test statistic falls outside the range [-2.262,2.262] so 
+we can reject the null hypothesis for this dose. 
+
+We could, alternately, have used t.test:
+```{r}
+t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 0.5,]$len,ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 0.5,]$len)$statistic
+```
+This matches our computation.
+
+Performing the same test statistic computation for 1.0mg:
+```{r}
+(22.70-16.77)/sqrt((3.911^2/10)+(2.515^2)/10)
+```
+```{r}
+t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 1.0,]$len,ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 1.0,]$len)$statistic
+```
+Our manual computation agrees with the t.test computation. 
+We can again reject the null hypothesis for 1.0mg.
+
+Finally, for 2.0mg we perform the same computation of the 
+test statistic.
+```{r}
+(26.06-26.14)/sqrt((2.655^2/10)+(4.798^2)/10)
+```
+```{r}
+t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 2.0,]$len,ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 2.0,]$len)$statistic
+```
+This time the test statistic falls within the interval
+[-2.262,2.262] and we cannot reject the null hypothesis for 
+2.0mg.
+
+### Conclusions
+From the data and analysis we conclude that we reject the 
+null hypothesis $H_{0}:\mu_{VC}=\mu_{OJ}$ and adopt the 
+alternative hypothesis $H_{a}:\mu_{VC}\neq\mu_{OJ}$ but only 
+for dosages 0.5mg and 1.0mg. For 2.0mg, the data does not 
+support rejecting the null hypothesis.
