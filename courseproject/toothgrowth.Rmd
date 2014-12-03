@@ -32,7 +32,9 @@ qplot(dose, len, colour=supp, data=ToothGrowth, facets= dose ~ supp, geom="boxpl
 A summary of the means and standard deviation and error for 
 the samples of the different treatments.
 ```{r}
-ddply(.data = ToothGrowth, .variables = .(supp,dose), summarize, mean = mean(len), std.dev = sd(len), n=length(len), std.error = sd(len)/sqrt(length(len)))
+ddply(.data = ToothGrowth, .variables = .(supp,dose), summarize, 
+      mean = mean(len), std.dev = sd(len), n=length(len), 
+      std.error = sd(len)/sqrt(length(len)))
 ```
 
 From the summary data and the box plot, it would appear that 
@@ -76,7 +78,8 @@ we can reject the null hypothesis for this dose.
 
 We could, alternately, have used t.test:
 ```{r}
-t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 0.5,]$len,ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 0.5,]$len)$statistic
+t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 0.5,]$len,
+       ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 0.5,]$len)$statistic
 ```
 This matches our computation.
 
@@ -85,7 +88,8 @@ Performing the same test statistic computation for 1.0mg:
 (22.70-16.77)/sqrt((3.911^2/10)+(2.515^2)/10)
 ```
 ```{r}
-t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 1.0,]$len,ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 1.0,]$len)$statistic
+t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 1.0,]$len,
+       ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 1.0,]$len)$statistic
 ```
 Our manual computation agrees with the t.test computation. 
 We can again reject the null hypothesis for 1.0mg.
@@ -96,7 +100,8 @@ test statistic.
 (26.06-26.14)/sqrt((2.655^2/10)+(4.798^2)/10)
 ```
 ```{r}
-t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 2.0,]$len,ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 2.0,]$len)$statistic
+t.test(ToothGrowth[ToothGrowth$supp == "OJ" & ToothGrowth$dose == 2.0,]$len,
+       ToothGrowth[ToothGrowth$supp == "VC" & ToothGrowth$dose == 2.0,]$len)$statistic
 ```
 This time the test statistic falls within the interval
 [-2.262,2.262] and we cannot reject the null hypothesis for 
@@ -108,3 +113,13 @@ null hypothesis $H_{0}:\mu_{VC}=\mu_{OJ}$ and adopt the
 alternative hypothesis $H_{a}:\mu_{VC}\neq\mu_{OJ}$ but only 
 for dosages 0.5mg and 1.0mg. For 2.0mg, the data does not 
 support rejecting the null hypothesis.
+
+We therefore conclude that delivery of vitamin C via orange 
+juice results in greater tooth growth compared to ascorbic 
+acid at 0.5mg and 1.0mg dosages. At a 2.0mg dose, both ascorbic
+acid and orange juice result in similar levels of tooth growth.
+
+![Guinea pig odontoblasts][1]
+
+[1]:fig1.jpg "Guinea pig odontoblasts"
+
