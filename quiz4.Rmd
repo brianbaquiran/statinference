@@ -1,0 +1,164 @@
+---
+title: "Quiz 4"
+author: "Brian Baquiran"
+date: "November 27, 2014"
+output: html_document
+---
+### Question 1
+A pharmaceutical company is interested in testing a potential blood pressure lowering medication. Their first examination considers only subjects that received the medication at baseline then two weeks later. The data are as follows (SBP in mmHg)
+
+Subject|Baseline|Week 2
+-------|--------|-----
+1|	140|	132
+2|	138|	135
+3|	150|	151
+4|	148|	146
+5|	135|	130
+
+Consider testing the hypothesis that there was a mean reduction in blood pressure? Give the P-value for the associated two sided T test.
+
+(Hint, consider
+
+* 0.043
+* __0.087__
+* 0.10
+* 0.05
+
+__Solution__
+
+We do a paired two-sided t-test.
+
+```{r}
+baseline <- c(140,138,150,148,135)
+wk2 <- c(132,135,151,146,130)
+
+# We do a paired t-test, and indicate we want the alternative
+# where baseline is greater than week 2 measurement
+
+t.test(baseline,wk2,paired=TRUE,alternative="two.sided")
+```
+We get the p-value `r t.test(baseline,wk2,paired=TRUE,alternative="two.sided")$p.value`.
+
+### Question 2
+A sample of 9 men yielded a sample average brain volume of 1,100cc and a standard deviation of 30cc. What is the complete set of values of $\mu_0$ that a test of $H_0:\mu=\mu_0$ would fail to reject the null hypothesis in a two sided 5% Students t-test?
+
+* 1080 to 1120
+* 1081 to 1119
+* __1077 to 1123__
+* 1031 to 1169
+
+__Solution__
+This is similar to the third homework problem except that
+we will use the Student's t-test due to the low sample size. 
+Again we want to find the confidence interval.
+
+```{r}
+alpha <- 0.05
+n <- 9
+s <- 30
+mu <- 1100
+t <- qt(1-alpha/2, n-1)
+stderr <- s/sqrt(n)
+delta <- t * stderr
+mu + c(-1,1)*qt(1-alpha/2,n-1)*s/sqrt(n)
+```
+
+### Question 3
+Researchers conducted a blind taste test of Coke versus Pepsi. Each of four people was asked which of two blinded drinks given in random order that they preferred. The data was such that 3 of the 4 people chose Coke. Assuming that this sample is representative, report a P-value for a test of the hypothesis that Coke is preferred to Pepsi using a one sided exact test.
+
+* 0.62
+* __0.31__
+* 0.10
+* 0.005
+
+__Solution__
+This is similar to the fourth homework question.
+
+```{r}
+pbinom(2,size=4,prob=0.5,lower.tail=FALSE)
+```
+
+### Question 4
+Infection rates at a hospital above 1 infection per 100 person days at risk are believed to be too high and are used as a benchmark. A hospital that had previously been above the benchmark recently had 10 infections over the last 1,787 person days at risk. About what is the one sided P-value for the relevant test of whether the hospital is __below__ the standard?
+
+* __0.03__
+* 0.52
+* 0.11
+* 0.22
+
+__Solution__
+Similar to fifth homework question.
+
+```{r}
+ppois(10,lambda=1/100*1787,lower.tail=TRUE)
+```
+
+### Question 5
+Suppose that 18 obese subjects were randomized, 9 each, to a new diet pill and a placebo. Subjects’ body mass indices (BMIs) were measured at a baseline and again after having received the treatment or placebo for four weeks. The average difference from follow-up to the baseline (followup - baseline) was −3 kg/m2 for the treated group and 1 kg/m2 for the placebo group. The corresponding standard deviations of the differences was 1.5 kg/m2 for the treatment group and 1.8 kg/m2 for the placebo group. Does the change in BMI appear to differ between the treated and placebo groups? Assuming normality of the underlying data and a common population variance, give a pvalue for a two sided t test.
+
+* Larger than 0.10
+* Less than 0.10 but larger than 0.05
+* __Less than 0.01__
+* Less than 0.05, but larger than 0.01
+
+__Solution__
+This is the same scenario inQuestion 7 of Quiz 3. 
+```{r}
+Xbar <- (-3)
+s.x <- 1.5
+Ybar <- 1
+s.y <- 1.8
+n.y <- n.x <- 9
+#alpha <- .10
+alpha <- .05
+df <- n.x + n.y - 2
+# pooled (weighted) standard deviation
+S.p <- sqrt(((n.x - 1)*s.x^2 + (n.y-1)*s.y^2)/df)
+print(S.p)  
+
+se <-  S.p * sqrt(1/n.x + 1/n.y)
+# Confidence interval for independent groups
+print((Xbar-Ybar) + c(-1,1) * qt(1-alpha/2,df) * se)
+print(Xbar-Ybar)
+pt((Xbar-Ybar)/se,df)
+```
+
+### Question 6
+Brain volumes for 9 men yielded a 90% confidence interval of
+1,077 cc to 1,123 cc. Would you reject in a two sided 5% 
+hypothesis test of $H_0:\mu=1,078$?
+
+* Yes you would reject.
+* It's impossible to tell.
+* Where does Brian come up with these questions?
+* __No you wouldn't reject.__
+
+### Question 7
+Researchers would like to conduct a study of 100 healthy adults to detect a four year mean brain volume loss of .01 mm3. Assume that the standard deviation of four year volume loss in this population is .04 mm3. About what would be the power of the study for a 5% one sided test versus a null hypothesis of no volume loss?
+
+```{r}
+power.t.test(n=100,delta=0.01,sd=0.04,sig.level=0.05,alternative="one.sided",type="one.sample")
+```
+
+Power will be `r power.t.test(n=100,delta=0.01,sd=0.04,sig.level=0.05,alternative="one.sided",type="one.sample")$power`
+
+
+### Question 8
+Researchers would like to conduct a study of n healthy adults to detect a four year mean brain volume loss of .01 mm3. Assume that the standard deviation of four year volume loss in this population is .04 mm3. About what would be the value of n needded for 90% power of type one error rate of 5% one sided test versus a null hypothesis of no volume loss?
+
+```{r}
+power.t.test(power=0.9,delta=0.01,sd=0.04,sig.level=0.05,alternative="one.sided",type="one.sample")
+```
+
+n will be `r power.t.test(power=0.9,delta=0.01,sd=0.04,sig.level=0.05,alternative="one.sided",type="one.sample")$n`
+
+###Question 9
+As you increase the type one error rate, α, what happens to power?
+
+* You will get smaller power.
+* No, for real, where does Brian come up with these problems?
+* It's impossible to tell given the information in the problem.
+* __You will get larger power.__
+
+
+

@@ -1,0 +1,23 @@
+---
+title: "Statistical Inference Homework 4"
+author: "Brian Baquiran"
+date: "November 27, 2014"
+output: html_document
+---
+
+### Question 1
+Load the data set mtcars in the datasets R package. Assume that the data set mtcars is a random sample. Compute the mean MPG, $\bar{x}$, of this sample.
+
+You want to test whether the true MPG is $\mu_0$ or smaller using a one sided 5% level test. ($H_0:\mu=\mu_0$ versus $H_a:\mu<\mu_0$). Using that data set and a Z test:
+
+Based on the mean MPG of the sample $\bar{x}$, and by using a Z test: what is the smallest value of $\mu_0$ that you would reject for (to two decimal places)?
+
+__Answer__
+```{r}
+data(mtcars)
+mu <- mean(mtcars$mpg)
+s <- sd(mtcars$mpg)
+n <-length(mtcars$mpg)
+alpha <- 0.05
+qt(1-alpha/2, n-1)
+```
